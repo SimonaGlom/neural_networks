@@ -19,6 +19,23 @@ Prístup klasifikácie z predspracovaných dát sa delil na 2 množiny.
  1. Skrytý Markov Model (ďalej HMM) - po predspracovaných dátach je potrebná ešte vektorová kvantizácia. Tento model je známy svojou použiteľnosťou na poli rozpoznávania časových vzorov, teda je použiteľný aj na náš problém. Základný vzor je Markov model, od ktorého je HMM odvodené práve kvôli skrytiu stavu. Avšak výstup viditeľný je. [3][4]
  2. Konvolučné neurónové siete (ďalej CNN) - siahajú až do 80. rokov, ale len nedávno boli prijaté ako metóda výberu pre rôzne úlohy klasifikácie objektov. V prácach sa líšil počet použitých vrstiev konvolučných sietí. Boli použité 2 [2] - 3 [1] vrstvy s maximálnym združovaním a dropdown-om. Aktivácia pri vrstvách bola vykonávaná pomocou funkcie ReLU.
 
+## Dataset
+
+Použitiu neurónových sietí na klasifikačné úlohy predchádza proces ich trénovania. Počas tohto procesu neurónová sieť, extrahovaním hlbšieho významu z poskytnutých dát, získavá požadovanú schopnosť zaradiť objekt do vybraných tried. Trénovanie neurónovej siete priamo závisí na samotnom návrhu a implementácii neurónovej siete, ako aj na kvalite a kvantite dát poskytnutých na učenie.
+
+Dáta potrebné na trénovanie a následne overenie funkčnosti neurónovej siete je možné získať z niekoľkých zdrojov, z ktorých dostupné sú:
+1. Extrakcia zvukov zvierat z video súborov (napr. videá z youtube)
+2. Použitie amatérskych datasetov a zvukových súborov (zvukové banky)
+3. Použitie verejných zvukových archívov zozbieraných vedeckými inštitúciami
+
+Pri zohľadnení kvality, vierohodnosti (nie je možné manuálne overiť každý zvukový súbor) a robustnosti dostupných zdrojov, je posledný spomínaný zdroj (verejné zvukové archívy) najvhodnejším z nich.
+
+Voľne dostupné zvukové archívy, ktoré poskytujú požadované dáta:
+1. [Zvukový archív zvierat Prírodovedného múzea v Berlíne](https://www.gbif.org/dataset/b7ec1bf8-819b-11e2-bad2-00145eb45e9a)
+2. [Zvuková knižnica Macaulay](https://www.macaulaylibrary.org)
+
+Tieto datasety spoločne poskytujú viac ako stotisíc zvukových nahrávok rôznych druhov zvierat. Nájdeme v nich kratšie aj dlhšie zvukové nahrávky (od dvoch sekúnd, až po niekoľko minút). Okrem zvukových nahrávok a dát o nich, datasety poskytujú aj základné informácie (identifikátor, meno, ...) o zvierati prislúchajúcom k zvukovej stope. Tieto dáta je následne možné jednoducho rožšíriť pomocou ľahko dostupných informácií o vybranom zvierati, čo môže pomôcť k vyššej presnosti klasifikácie (napr. odlíšenie zvukov párnokopytníkov a vtákov podľa príslušnosti k zvieraciemu radu).
+
 ## Návrh riešenia na vysokej úrovni
 ![Algoritmus navrhu riesenia projektu](./images/algo.png)
 ## Citácie
