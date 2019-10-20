@@ -25,7 +25,7 @@ Prístup klasifikácie z predspracovaných dát sa delil na 2 množiny.
 
 ## Dataset
 
-Použitiu neurónových sietí na klasifikačné úlohy predchádza proces ich trénovania. Počas tohto procesu neurónová sieť, extrahovaním hlbšieho významu z poskytnutých dát, získavá požadovanú schopnosť zaradiť objekt do vybraných tried. Trénovanie neurónovej siete priamo závisí na samotnom návrhu a implementácii neurónovej siete, ako aj na kvalite a kvantite dát poskytnutých na učenie.
+Použitiu neurónových sietí na klasifikačné úlohy predchádza proces ich trénovania. Počas tohto procesu neurónová sieť, extrahovaním hlbšieho významu z poskytnutých dát, získavá požadovanú schopnosť zaradiť objekt do vybraných tried. Trénovanie neurónovej siete priamo závisí na samotnom návrhu a implementácii neurónovej siete, ako aj na kvalite a kvantite dát poskytnutých na jej učenie.
 
 Dáta potrebné na trénovanie a následne overenie funkčnosti neurónovej siete je možné získať z niekoľkých zdrojov, z ktorých dostupné sú:
 1. Extrakcia zvukov zvierat z video súborov (napr. videá z youtube)
