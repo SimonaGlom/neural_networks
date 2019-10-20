@@ -17,7 +17,7 @@ S akou pravdepodobnosťou sa zvierací zvuk identifikuje k triedam hľadaných z
 ## Podobné práce
 
 Skúmanie zvuku má v dnešnom svete vzostupný charakter. V podobných prácach sme narazili na generalizáciu tohto problému bez ohľadu na domény. Zvukový súbor (napríklad vo formáte .wav) pomocou predspracovaní a extrahovania vstúpi do výpočtu ako spektogram alebo MFCC spektogram. 
-> Hlavný rozdiel spočíva v tom, že spektrogram používa lineárnu frekvenčnú stupnicu (takže každý kmit je od seba vzdialený rovnakým počtom Hertzov), zatiaľ čo MFCC spektogram používa logaritmickú frekvenčnú stupnicu, ktorá je podobnejšia ľudskému zvukovému vnímaniu. 
+> Hlavný rozdiel spočíva v tom, že spektrogram používa lineárnu frekvenčnú stupnicu. Zatiaľ čo MFCC spektogram používa logaritmickú frekvenčnú stupnicu, ktorá je podobnejšia ľudskému zvukovému vnímaniu. 
 
 Prístup klasifikácie z predspracovaných dát sa delil na 2 množiny. 
  1. Skrytý Markov Model (ďalej HMM) - po predspracovaných dátach je potrebná ešte vektorová kvantizácia. Tento model je známy svojou použiteľnosťou na poli rozpoznávania časových vzorov, teda je použiteľný aj na náš problém. Základný vzor je Markov model, od ktorého je HMM odvodené práve kvôli skrytiu stavu. Avšak výstup viditeľný je. [3][4]
@@ -44,11 +44,11 @@ Tieto datasety spoločne poskytujú viac ako stotisíc zvukových nahrávok rôz
 
 Vstup do klasifikácie zvieracích zvukov je surový súbor obsahujúci krátke audio jedného zvieracieho zvuku (napr. štekajúci pes). 
 
-_Predspracovanie_ - Zvukové vlny sa digitalizujú ich vzorkovaním v diskrétnych intervaloch známych ako vzorkovacia frekvencia. Každá vzorka je amplitúda vlny v konkrétnom časovom intervale, kde bitová hĺbka určuje, ako podrobne bude vzorka známa aj ako dynamický rozsah signálu. Následne takto vytvorenú dátovú množinu znormalizujeme.
+__Predspracovanie__ - Zvukové vlny sa digitalizujú vzorkovaním v diskrétnych intervaloch - vzorkovacia frekvencia. Každá vzorka je amplitúda vlny v konkrétnom časovom intervale. Bitová hĺbka určuje podrobnosť vzorky a jej dynamického rozsahu signálu. Následne takto vytvorenú dátovú množinu znormalizujeme.
 
-_MFCC_ - Ďalším krokom algoritmu je z normalizovaných dát vyextrahovať vlastnosti, ktoré budeme pri trénovaní dát používať. Rozhodli sme sa použiť MFCC spektogram kvôli spomínanej podobnosti s ľudským vnimaním zvuku.
+__MFCC__ - Ďalším krokom algoritmu je zo normalizovaných dát vyextrahovať vlastnosti, ktoré budeme pri trénovaní dát používať. Rozhodli sme sa použiť MFCC spektogram kvôli spomínanej podobnosti s ľudským vnímaním zvuku.
 
-_CNN_ - Na začiatku sa budeme držať prístupu z podobných prác [2] a [1], ktorý sme predstavili vyššie.Následne budeme iterovať až kým nedosiahneme, čo najlepšie výsledky. 
+__CNN__ - Na začiatku sa budeme držať prístupu zo sekcie podobných prác [2] a [1], ktorý sme predstavili vyššie. Následne sa pokúsime iteráciou dosiahnuť, čo najlepšie výsledky. 
 
 Tabuľka zobrazujúca výstup na obrázku znázorňuje s akou pravdepodobnosťou zvuk zvieraťa na vstupe patrí do druhu zvieraťa/triedy zvieraťa. Zvuková stopa (zvuk zvieraťa) je klasifikovaná do triedy s najvyššou pravdepodonosťou správnej predikcie.
 
