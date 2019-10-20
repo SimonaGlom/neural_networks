@@ -50,7 +50,7 @@ _MFCC_ - Ďalším krokom algoritmu je z normalizovaných dát vyextrahovať vla
 
 _CNN_ - Na začiatku sa budeme držať prístupu z podobných prác [2] a [1], ktorý sme predstavili vyššie.Následne budeme iterovať až kým nedosiahneme, čo najlepšie výsledky. 
 
-Tabuľka zobrazujúca výstup na obrázku znázorňuje s akou pravdepodobnosťou zvuk zvieraťa na vstupe patrí do druhu zvieraťa/triedy zvieraťa.
+Tabuľka zobrazujúca výstup na obrázku znázorňuje s akou pravdepodobnosťou zvuk zvieraťa na vstupe patrí do druhu zvieraťa/triedy zvieraťa. Zvuková stopa (zvuk zvieraťa) je klasifikovaná do triedy s najvyššou pravdepodonosťou správnej predikcie.
 
 ![Algoritmus navrhu riesenia projektu](./images/algo.png)
 
