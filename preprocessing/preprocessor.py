@@ -1,5 +1,6 @@
 from pydub import AudioSegment
-
+import librosa
+import numpy
 
 def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
     """
