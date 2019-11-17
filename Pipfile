@@ -11,6 +11,7 @@ tornado = "*"
 matplotlib = "*"
 selenium = {webdriver = "*"}
 pydub = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.6"
