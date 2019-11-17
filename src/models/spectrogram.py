@@ -46,7 +46,6 @@ def log_scale_spec(spec, sr=44100, factor=20.):
     return new_spectrogram, frequemcies
 
 
-
 def plot_audio_spectrogram(audio_path, binsize=2**10, plot_path=None, argv = '', colormap="jet"):
     sample_rate, samples = wav.read(audio_path)
     s = stft(samples, binsize)

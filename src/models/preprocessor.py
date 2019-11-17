@@ -39,6 +39,7 @@ def mfcc_spectogram(file_name):
         audio, sample_rate = librosa.load(file_name, res_type='kaiser_fast')
         mfccs = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=40)
         mfccsscaled = numpy.mean(mfccs.T, axis=0)
+        print(sample_rate, mfccs)
 
     except Exception as e:
         print("Error encountered while parsing file: ", file_name)
@@ -48,6 +49,7 @@ def mfcc_spectogram(file_name):
 
 
 # TODO doimplementovať
+"""
 sound = AudioSegment.from_file("/path/to/file.wav", format="wav")
 
 start_trim = detect_leading_silence(sound)
@@ -55,3 +57,4 @@ end_trim = detect_leading_silence(sound.reverse())
 
 duration = len(sound)
 trimmed_sound = sound[start_trim:duration - end_trim]
+"""
