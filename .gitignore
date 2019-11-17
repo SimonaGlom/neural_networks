@@ -1,4 +1,4 @@
 .idea
+venv
 dataset_parser/records
-dataset_parser/venv
-dataset_parser/.idea
+.ipynb_checkpoints

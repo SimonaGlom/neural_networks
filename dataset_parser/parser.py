@@ -5,10 +5,24 @@ import csv
 import urllib.request
 import logging
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import _pickle as cPickle
+import urllib.parse
+import importlib
+
 
 class datasetParser(object):
+    # set up columns to save
+    # name: index in dataset
+    rx_dict = {
+        'format': 2,
+        'record_url': 3,
+        'info_url': 4
+    }
+
     @staticmethod
-    def _parse_line(line):
+    def __parse_line(line):
         """
         Save all defined columns and search name of spieces
         return info about spieces
@@ -19,7 +33,7 @@ class datasetParser(object):
         sample = {}
 
         # get required data
-        for key, rx in rx_dict.items():
+        for key, rx in datasetParser.rx_dict.items():
             sample.update({key: line[rx]})
 
         # search name of spieces with regular expression
@@ -57,7 +71,7 @@ class datasetParser(object):
                     continue
 
                 # parse one line
-                sample = datasetParser()._parse_line(row)
+                sample = datasetParser().__parse_line(row)
 
                 # if sample is well formatted
                 if sample is not None:
@@ -66,11 +80,55 @@ class datasetParser(object):
         return data
 
     @staticmethod
-    def get_aggregated(simplified_dataset, minimum_samples=None):
+    def __get_extended_information(latin_name):
+        """
+        Load additional information for spieces from online sources and parse it
+
+        :param latin_name: name of spieces in latin
+        :return: name, spieces for specified latin name
         """
 
-        :param simplified_dataset: parsed dataset
+        link = 'https://www.google.sk/search?q=' + latin_name.replace('_', '%20')
+
+        # load driver to render page
+        driver = webdriver.PhantomJS()
+        driver.get(link)
+
+        name = ''
+        spieces = ''
+        page_source = ''
+
+        # templates
+        page_templates = [
+            ['//*[@id="main"]/div[4]/div/div[1]/span[1]/div', '//*[@id="main"]/div[4]/div/div[1]/span[2]/div'],
+            ['//*[@id="main"]/div[3]/div/div[1]/span/div', '//*[@id="main"]/div[4]/div/div[1]/span[2]/div'],
+            ['//*[@id="main"]/div[5]/div/div[1]/span[1]/div', '//*[@id="main"]/div[5]/div/div[1]/span[2]/div']
+        ]
+
+        for page_template in page_templates:
+            # Get elements by their xpath
+            try:
+                name = driver.find_element(By.XPATH, page_template[0]).text
+                spieces = driver.find_element(By.XPATH, page_template[1]).text
+            except:
+                logging.info("nenašlo sa")
+
+            if name != '':
+                break
+
+        # for parser improvement only
+        if name == '':
+            page_source = driver.page_source
+
+        return name, spieces
+
+    @staticmethod
+    def get_aggregated(parsed_dataset, minimum_samples=None, download_extended_information=False):
+        """
+
+        :param parsed_dataset: parsed dataset
         :param minimum_samples: condition of minimum spieces occurrence in dataset
+        :param download_extended_information: load more information about animals from online encyclopedic pages
         :return: aggregated samples
         """
         aggregated = {}
@@ -78,19 +136,19 @@ class datasetParser(object):
 
 
         # aggregate dataset (sum samples count for every spieces)
-        for d in simplified_dataset:
+        for d in parsed_dataset:
             # new spieces
             if (d['name'] is not None) and (d['name'] not in aggregated):
                 aggregated[d['name']] = {}
                 aggregated[d['name']].update({sum_index: 1})
 
-                for key, rx in rx_dict.items():
+                for key, rx in datasetParser.rx_dict.items():
                     aggregated[d['name']].update({key: [d[key]]})
             # existing spieces, only append to arrays
             elif d['name'] is not None:
                 aggregated[d['name']][sum_index] += 1
 
-                for key, rx in rx_dict.items():
+                for key, rx in datasetParser.rx_dict.items():
                     aggregated[d['name']].get(key).append(d[key])
 
         logging.info(str(len(aggregated)) + ' animal spieces found!')
@@ -103,54 +161,74 @@ class datasetParser(object):
 
             logging.info(str(len(aggregated)) + ' animal spieces found, which have more than ' + minimum_samples + ' sound samples!')
 
+
+        if download_extended_information:
+            for key in list(aggregated):
+                print(key)
+
+                translated_name, translated_spieces = datasetParser().__get_extended_information(key)
+                aggregated[key]['name'] = translated_name
+                aggregated[key]['spieces'] = translated_spieces
+
         return aggregated
 
     @staticmethod
-    def download_records(aggregated_dataset):
+    def serialize_dataset_to_file(dataset, dataset_save_path):
+        cPickle.dump(dataset, open(dataset_save_path, 'wb'))
+
+    @staticmethod
+    def load_dataset_from_file(dataset_save_path):
+        dataset = cPickle.load(open(dataset_save_path, 'rb'))
+
+        return dataset
+
+    @staticmethod
+    def download_records(aggregated_dataset, records_directory, dataset_save_path):
         """
-        :param aggregated_dataset:
+        :param aggregated_dataset: parsed and aggregated dataset
+        :param records_directory: path to records directory
         """
-        directory = './records'
+
+        filepath_key = 'filepath'
+        logging.info('Downloading ...')
 
         # create folder for records
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        if not os.path.exists(records_directory):
+            os.makedirs(records_directory)
 
+
+        order = 0
         for key in aggregated_dataset:
             i = 0
 
+            actual_spieces_folder = records_directory + '/' + key
+
+            if not filepath_key in aggregated_dataset[key]:
+                aggregated_dataset[key][filepath_key] = dict()
+
+            # create folder for spieces
+            if not os.path.exists(actual_spieces_folder):
+                os.makedirs(actual_spieces_folder)
+
+            logging.info('Spieces(' + str(order) + '/' + str(len(aggregated_dataset)) + '): ' + actual_spieces_folder)
+
             # download all records for animal
             for record in aggregated_dataset[key]['record_url']:
-                file_name = key.lower()+str(i)+'.mp3'
-                full_file_name = os.path.join(directory, file_name).encode('utf8')
 
-                urllib.request.urlretrieve(str(record).encode('utf8'), full_file_name)
+                # if donwloaded already continue
+                if record in aggregated_dataset[key][filepath_key] and os.path.exists(aggregated_dataset[key][filepath_key][record]):
+                    continue
 
-                logging.info(file_name)
+                file_name = (key.lower()+str(i)+'.mp3')
+                full_file_name = os.path.join(actual_spieces_folder, file_name).encode('utf8')
+
+                urllib.request.urlretrieve(record, full_file_name)
+
+                # save actual file path to saved dataset file (for preventing duplicate downloading later)
+                aggregated_dataset[key][filepath_key][record] = full_file_name
                 i += 1
 
+            order += 1
 
-if __name__ == '__main__':
-    file_path = 'multimedia.txt'
-    logging.basicConfig(level=logging.DEBUG)
-
-    # set up columns to save
-    # name: index in dataset
-    rx_dict = {
-        'format': 2,
-        'record_url': 3,
-        'info_url': 4
-    }
-
-    parser = datasetParser()
-
-    # parsed dataset
-    data = parser.parse_dataset(file_path)
-
-    # aggregated dataset
-    aggregated_data = parser.get_aggregated(data)
-
-    # download records
-    # parser.download_records(aggregated_data)
-
-
+            # save paths
+            datasetParser.serialize_dataset_to_file(aggregated_dataset, dataset_save_path)
