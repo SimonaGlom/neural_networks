@@ -1,12 +1,12 @@
 import tensorflow.keras as keras
 
-
 class SoundAnimalDetector(keras.Model):
-    def __init__(self):
+    def __init__(self, dim_output):
         super(SoundAnimalDetector, self).__init__()
-        self.model_layers = {
+
+        self.model_layers = [
             keras.layers.Conv2D(
-                filters=16,
+                filters=1,
                 kernel_size=3,
                 padding='same',
                 activation='relu'),
@@ -35,7 +35,7 @@ class SoundAnimalDetector(keras.Model):
             keras.layers.Dense(
                 units=dim_output,
                 activation='softmax')
-        }
+        ]
 
     def call(self, x):
         for layer in self.model_layers:
