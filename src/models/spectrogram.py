@@ -91,11 +91,15 @@ def plot_audio_spectrogram(audio_path, binsize=2**10, plot_path=None, argv = '',
 
     return data
 
-if len(sys.argv) > 2:
-    ims = plot_audio_spectrogram(sys.argv[1], 2**10, output_folder + '/'+ ntpath.basename(sys.argv[1].replace('.wav','')) + '.png',  sys.argv[2])
 
-else:
-    ims = plot_audio_spectrogram(sys.argv[1], 2**10, None, '')
+def create_spectogram(record_path, arg):
+    return plot_audio_spectrogram(record_path, 2**10, output_folder + '/'+ ntpath.basename(record_path.replace('.wav','')) + '.png',  arg)
+
+#if len(sys.argv) > 2:
+#    ims = plot_audio_spectrogram(sys.argv[1], 2**10, output_folder + '/'+ ntpath.basename(sys.argv[1].replace('.wav','')) + '.png',  sys.argv[2])
+
+#else:
+#    ims = plot_audio_spectrogram(sys.argv[1], 2**10, None, '')
 
 
 

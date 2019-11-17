@@ -19,6 +19,23 @@ def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
 
     return trim_ms
 
+
+def split_records(audio_path, slice_length=3000):
+    new_paths = []
+    path_base = audio_path[:-4]
+
+    record = AudioSegment.from_wav(audio_path)
+    duration = len(record)
+
+    for i in range(int(duration/slice_length)):
+        new_path = path_base + '_' + str(i) + '.wav'
+        chunk_data = record[i*slice_length : (i+1)*slice_length]
+        chunk_data.export(new_path, format="wav")
+
+        new_paths.append(new_path)
+
+    return new_paths
+
 def from_mp3_to_wav(audio_path):
     """
        Implement convertor from mp3 to wav
@@ -27,6 +44,8 @@ def from_mp3_to_wav(audio_path):
        """
     sound = AudioSegment.from_mp3(audio_path)
     sound.export(audio_path.replace('.mp3', '.wav'), format="wav")
+
+    return audio_path.replace('.mp3', '.wav')
 
 def mfcc_spectogram(file_name):
     """

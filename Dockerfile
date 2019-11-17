@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         libssl-dev \
         libpq-dev \
+        ffmpeg \
         libcurl4-gnutls-dev \
         libexpat1-dev \
         gettext \

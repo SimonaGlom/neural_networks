@@ -2,3 +2,6 @@
 venv
 dataset_parser/records
 .ipynb_checkpoints
+data
+!data/.initial
+notebooks/.ipynb_checkpoints
