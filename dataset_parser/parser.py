@@ -4,7 +4,7 @@ import csv
 
 import urllib.request
 import logging
-
+import locale
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import _pickle as cPickle
@@ -196,7 +196,6 @@ class datasetParser(object):
         if not os.path.exists(records_directory):
             os.makedirs(records_directory)
 
-
         order = 0
         for key in aggregated_dataset:
             i = 0
@@ -222,7 +221,18 @@ class datasetParser(object):
                 file_name = (key.lower()+str(i)+'.mp3')
                 full_file_name = os.path.join(actual_spieces_folder, file_name).encode('utf8')
 
-                urllib.request.urlretrieve(record, full_file_name)
+                url = record
+                url = urllib.parse.urlparse(url)
+                url = url.scheme + "://" + url.netloc + urllib.parse.quote(url.path, encoding='ISO-8859-1')
+
+                try:
+                    urllib.request.urlretrieve(url, full_file_name)
+                except urllib.request.HTTPError as err:
+                    logging.warn("URL not found")
+                    continue
+                except:
+                    logging.error("Undefined error: " + url)
+                    continue
 
                 # save actual file path to saved dataset file (for preventing duplicate downloading later)
                 aggregated_dataset[key][filepath_key][record] = full_file_name
