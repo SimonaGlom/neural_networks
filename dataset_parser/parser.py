@@ -9,6 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import _pickle as cPickle
 import urllib.parse
+import sys
 import importlib
 
 
@@ -242,3 +243,4 @@ class datasetParser(object):
 
             # save paths
             datasetParser.serialize_dataset_to_file(aggregated_dataset, dataset_save_path)
+
