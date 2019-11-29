@@ -215,12 +215,18 @@ class datasetParser(object):
             # download all records for animal
             for record in aggregated_dataset[key]['record_url']:
 
-                # if donwloaded already continue
-                if record in aggregated_dataset[key][filepath_key] and os.path.exists(aggregated_dataset[key][filepath_key][record]):
-                    continue
-
                 file_name = (key.lower()+str(i)+'.mp3')
                 full_file_name = os.path.join(actual_spieces_folder, file_name).encode('utf8')
+
+                # if donwloaded already continue
+                if record not in aggregated_dataset[key][filepath_key] and os.path.exists(full_file_name):
+                    aggregated_dataset[key][filepath_key][record] = full_file_name
+                    i += 1
+                    continue
+
+                if record in aggregated_dataset[key][filepath_key] and os.path.exists(aggregated_dataset[key][filepath_key][record]):
+                    i += 1
+                    continue
 
                 url = record
                 url = urllib.parse.urlparse(url)

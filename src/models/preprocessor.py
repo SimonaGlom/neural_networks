@@ -1,6 +1,7 @@
 from pydub import AudioSegment
 import librosa
 import numpy
+import os
 
 def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
     """
@@ -20,21 +21,26 @@ def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
     return trim_ms
 
 
-def split_records(audio_path, slice_length=3000):
+def split_records(audio_path, new_folder, slice_length=3000):
     new_paths = []
-    path_base = audio_path[:-4]
+    path_base = new_folder
+
+    #convert
+    if audio_path.endswith('mp3'):
+        audio_path = from_mp3_to_wav(audio_path)
 
     record = AudioSegment.from_wav(audio_path)
     duration = len(record)
 
     for i in range(int(duration/slice_length)):
-        new_path = path_base + '_' + str(i) + '.wav'
+        new_path = new_folder + '/' + str(i) + '.wav'
         chunk_data = record[i*slice_length : (i+1)*slice_length]
         chunk_data.export(new_path, format="wav")
 
         new_paths.append(new_path)
 
     return new_paths
+
 
 def from_mp3_to_wav(audio_path):
     """

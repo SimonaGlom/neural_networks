@@ -1,7 +1,7 @@
 import logging
 from os import path
 
-from parser import datasetParser
+from dataset_parser.parser import datasetParser
 
 if __name__ == '__main__':
     parser = datasetParser()
