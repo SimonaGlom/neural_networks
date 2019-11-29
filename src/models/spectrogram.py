@@ -46,7 +46,7 @@ def log_scale_spec(spec, sr=44100, factor=20.):
     return new_spectrogram, frequemcies
 
 
-def plot_audio_spectrogram(audio_path, binsize=2**10, plot_path=None, argv = '', colormap="jet"):
+def plot_audio_spectrogram(audio_path, binsize=2**10, plot_path=None, argv='', colormap="jet"):
     sample_rate, samples = wav.read(audio_path)
     s = stft(samples, binsize)
     new_spectrogram, freq = log_scale_spec(s, factor=1.0, sr=sample_rate)
@@ -54,35 +54,38 @@ def plot_audio_spectrogram(audio_path, binsize=2**10, plot_path=None, argv = '',
 
     time_bins, freq_bins = np.shape(data)
 
-    print("Time bins: ", time_bins)
-    print("Frequency bins: ", freq_bins)
-    print("Sample rate: ", sample_rate)
-    print("Samples: ", len(samples))
+    #print("Time bins: ", time_bins)
+    #print("Frequency bins: ", freq_bins)
+    #print("Sample rate: ", sample_rate)
+    #print("Samples: ", len(samples))
     plt.figure(figsize=(time_bins/100, freq_bins/100)) # resolution equal to audio data resolution, dpi=100 as default
-    plt.imshow(np.transpose(data), origin="lower", aspect="auto", cmap=colormap, interpolation="none")
-
+    img = plt.imshow(np.transpose(data), origin="lower", aspect="auto", cmap=colormap, interpolation="none")
+    plt.axis('off')
     # Labels
-    plt.xlabel("Time(s)")
-    plt.ylabel("Frequency(Hz)")
-    plt.xlim([0, time_bins-1])
-    plt.ylim([0, freq_bins])
+    #plt.xlabel("Time(s)")
+    #plt.ylabel("Frequency(Hz)")
+    #plt.xlim([0, time_bins-1])
+    #plt.ylim([0, freq_bins])
 
 
-    if 'l' in argv:
-        plt.colorbar().ax.set_xlabel('dBFS')
-    else:
-        plt.subplots_adjust(left=0,right=1,bottom=0,top=1)
-        plt.axis('off')
+    #if 'l' in argv:
+    #    plt.colorbar().ax.set_xlabel('dBFS')
+    #else:
+    #    plt.subplots_adjust(left=0,right=1,bottom=0,top=1)
+    #    plt.axis('off')
 
-    x_locations = np.float32(np.linspace(0, time_bins-1, 10))
-    plt.xticks(x_locations, ["%.02f" % l for l in ((x_locations*len(samples)/time_bins)+(0.5*binsize))/sample_rate])
-    y_locations = np.int16(np.round(np.linspace(0, freq_bins-1, 20)))
-    plt.yticks(y_locations, ["%.02f" % freq[i] for i in y_locations])
-
+    #x_locations = np.float32(np.linspace(0, time_bins-1, 10))
+    #plt.xticks(x_locations, ["%.02f" % l for l in ((x_locations*len(samples)/time_bins)+(0.5*binsize))/sample_rate])
+    #y_locations = np.int16(np.round(np.linspace(0, freq_bins-1, 20)))
+    #plt.yticks(y_locations, ["%.02f" % freq[i] for i in y_locations])
 
     if 's' in argv:
-        print('Unlabeled output saved as.png')
+        #print('Unlabeled output saved as .png')
         plt.savefig(plot_path)
+        plt.close('all')
+        plt.cla()
+
+        return plot_path
     else:
         print('Graphic interface...')
         plt.show()
@@ -90,6 +93,14 @@ def plot_audio_spectrogram(audio_path, binsize=2**10, plot_path=None, argv = '',
     plt.clf()
 
     return data
+
+
+def create_spectogram_image(record_path, binsize=2**10, plot_path=None, argv = '', colormap="jet"):
+    sample_rate, samples = wav.read(record_path)
+    s = stft(samples, binsize)
+    new_spectrogram, freq = log_scale_spec(s, factor=1.0, sr=sample_rate)
+
+    return 20. * np.log10(np.abs(new_spectrogram) / 10e+6)  # dBFS
 
 
 def create_spectogram(record_path, arg):

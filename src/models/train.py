@@ -7,8 +7,8 @@ from sklearn.preprocessing import LabelEncoder
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import datetime
-from preprocessor import mfcc_spectogram
 from config import get_merged_values
+from src.models.preprocessor import mfcc_spectogram
 
 def prepare_data(path):
     """
