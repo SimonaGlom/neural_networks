@@ -19,7 +19,7 @@ class Dataset:
     def __load(self):
         return cPickle.load(open(self.path, 'rb'))
 
-    def get_records(self, min_samples=0, only_with_spieces_name=False):
+    def get_animals(self, min_samples=0, only_with_spieces_name=False):
         animals = []
 
         for key_spieces in self.raw_dataset:
@@ -151,7 +151,7 @@ class Record:
     def get_spectograms(self):
         return self.spectograms
 
-    def split_parts(self, folder, part_duration = 3000):
+    def split_parts(self, folder, part_duration=3000):
         self.parts = []
 
         self.parts = preprocessor.split_records(self.get_filepath(), folder, part_duration)
@@ -169,5 +169,5 @@ if __name__ == '__main__':
     dataset_path = 'dataset_parser/dataset_info.save'
     dataset = Dataset(dataset_path)
 
-    animals = dataset.get_records(min_samples=0, only_with_spieces_name=False)
+    animals = dataset.get_animals(min_samples=0, only_with_spieces_name=False)
     print(len(animals))
