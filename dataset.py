@@ -12,16 +12,37 @@ class Dataset:
 
         # Load dataset on initialization
         self.raw_dataset = self.__load()
+        self.record_path_key = 'filepath'
+        self.records_folder = 'dataset_parser/records'
+
 
     def __load(self):
         return cPickle.load(open(self.path, 'rb'))
 
-    def split_records(self, delete=False):
-        record_path_key = 'filepath'
-        records_folder = 'dataset_parser/records'
+    def get_records(self, min_samples=0, only_with_spieces_name=False):
+        animals = []
 
         for key_spieces in self.raw_dataset:
-            spieces_records_folder = os.path.join(records_folder, key_spieces)
+            raw_animal = self.raw_dataset[key_spieces]
+            spectograms = []
+
+            if self.record_path_key in self.raw_dataset[key_spieces]:
+                for record in self.raw_dataset[key_spieces][self.record_path_key]:
+                    record_path = self.raw_dataset[key_spieces][self.record_path_key][record].decode("utf-8")
+                    record = Record(record_path, key_spieces)
+                    spectograms += record.get_spectograms()
+
+            animal = Animal(key_spieces, raw_animal['name'], raw_animal['spieces'], spectograms)
+
+            if animal.get_spectograms_count() > min_samples and (not only_with_spieces_name or animal.has_assigned_spieces()):
+                animals.append(animal)
+
+        return animals
+
+    def split_records(self, delete=False):
+
+        for key_spieces in self.raw_dataset:
+            spieces_records_folder = os.path.join(self.records_folder, key_spieces)
 
             logging.info("Splitting: " + key_spieces)
 
@@ -33,8 +54,8 @@ class Dataset:
                     if os.path.isdir(record_folder):
                         shutil.rmtree(record_folder)
 
-            for record in self.raw_dataset[key_spieces][record_path_key]:
-                record_path = self.raw_dataset[key_spieces][record_path_key][record].decode("utf-8")
+            for record in self.raw_dataset[key_spieces][self.record_path_key]:
+                record_path = self.raw_dataset[key_spieces][self.record_path_key][record].decode("utf-8")
 
                 record = Record(record_path, key_spieces)
                 logging.info("Splitting: " + record.get_record_name_without_format())
@@ -53,6 +74,33 @@ class Dataset:
 
                 if not record.get_spectograms() or delete:
                     record.create_spectograms()
+
+
+class Animal:
+    def __init__(self, name, animal_name_sk, spieces_name, spectograms):
+        self.name = name
+        self.animal_name_sk = animal_name_sk
+        self.spieces_name = spieces_name
+        self.spectograms = spectograms
+
+    def get_spectograms_count(self):
+        return len(self.spectograms)
+
+    def get_spectograms(self):
+        return self.spectograms
+
+    def get_name(self):
+        return self.name
+
+    def get_name_sk(self):
+        return self.animal_name_sk
+
+    def has_assigned_spieces(self):
+        return not self.get_spieces()
+
+    def get_spieces(self):
+        return self.spieces_name
+
 
 class Record:
     def __init__(self, record_path, spieces_name):
@@ -111,10 +159,12 @@ class Record:
             print(plot_path)
             self.spectograms.append(spectogram.plot_audio_spectrogram(part, plot_path=plot_path, argv='s'))
 
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
     dataset_path = 'dataset_parser/dataset_info.save'
     dataset = Dataset(dataset_path)
 
-    dataset.split_records(True)
+    animals = dataset.get_records(min_samples=0, only_with_spieces_name=False)
+    print(len(animals))
