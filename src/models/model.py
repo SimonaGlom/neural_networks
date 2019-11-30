@@ -1,16 +1,13 @@
 import tensorflow.keras as keras
 
 class SoundAnimalDetector(keras.Model):
-    def __init__(self, dim_output):
+    def __init__(self, dim_output, num_rows, num_columns, num_channels):
         super(SoundAnimalDetector, self).__init__()
 
         self.model_layers = [
-            keras.layers.Conv2D(
-                filters=1,
-                kernel_size=3,
-                padding='same',
-                activation='relu'),
+            keras.layers.Conv2D(filters=16, kernel_size=2, input_shape=(num_rows, num_columns, num_channels), activation='relu'),
             keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            keras.layers.Dropout(0.2),
 
             keras.layers.Conv2D(
                 filters=32,
@@ -18,6 +15,7 @@ class SoundAnimalDetector(keras.Model):
                 padding='same',
                 activation='relu'),
             keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            keras.layers.Dropout(0.2),
 
             keras.layers.Conv2D(
                 filters=64,
@@ -25,11 +23,11 @@ class SoundAnimalDetector(keras.Model):
                 padding='same',
                 activation='relu'),
             keras.layers.MaxPooling2D(pool_size=(2, 2)),
+            keras.layers.Dropout(0.2),
 
             keras.layers.Flatten(),
-
             keras.layers.Dense(
-                units=512,
+                units=128,
                 activation='relu'),
 
             keras.layers.Dense(

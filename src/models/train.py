@@ -8,7 +8,8 @@ from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import datetime
 from config import get_merged_values
-from src.models.preprocessor import mfcc_spectogram
+import logging
+from preprocessor import mfcc_spectogram
 
 def prepare_data(path):
     """
@@ -34,7 +35,7 @@ def prepare_data(path):
     return train_test_split(mfccs, categories, test_size = 0.2)
 
 
-def train():
+def train(num_epochs = 20, num_batch_size = 128):
     """
         Function to train
         :param  num_epochs: number times that the learning algorithm will work
@@ -47,23 +48,23 @@ def train():
     num_columns = 4
     num_channels = 1
 
-
     x_train, x_test, y_train, y_test = prepare_data('src/data/AnimalSound.csv')
+
     x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
     x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
 
-    model = SoundAnimalDetector(dim_output=len(x_train))
+    model = SoundAnimalDetector(dim_output=3, num_rows = num_rows, num_columns = num_columns, num_channels = num_channels)
 
     model.compile(
         optimizer='adam',
-        loss='binary_crossentropy',
+        loss='categorical_crossentropy',
         metrics=['accuracy']
     )
 
     model.fit(x_train,
               y_train,
               batch_size=config['batch_size'],
-              epochs=config['num_epoch'],
+              epochs=config['num_epochs'],
               validation_data=(x_test, y_test),
               callbacks=[keras.callbacks.TensorBoard(
                   log_dir=os.path.join('logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
@@ -75,3 +76,8 @@ def train():
     model.save('/models/', save_format='tf')
     model.predict(x_test)
 
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+
+    train()
