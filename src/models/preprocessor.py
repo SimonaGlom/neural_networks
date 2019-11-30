@@ -70,7 +70,9 @@ def mfcc_spectogram(file_name):
         print("Error encountered while parsing file: ", file_name)
         return None
 
-    return mfccsscaled
+    mfccs = mfccs[:, :129]
+
+    return mfccs
 
 
 # TODO doimplementovať

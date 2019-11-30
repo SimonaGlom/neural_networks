@@ -10,6 +10,8 @@ import datetime
 from config import get_merged_values
 import logging
 from preprocessor import mfcc_spectogram
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Conv2D, MaxPooling2D,Dropout, GlobalAveragePooling2D
 
 def prepare_data(path):
     """
@@ -31,11 +33,35 @@ def prepare_data(path):
     category = numpy.array(featuresdf.class_label.tolist())
     label_encoder = LabelEncoder()
     categories = to_categorical(label_encoder.fit_transform(category))
+    x_train, x_test, y_train, y_test = train_test_split(mfccs, categories, test_size = 0.2)
 
-    return train_test_split(mfccs, categories, test_size = 0.2)
+    return x_train, x_test, y_train, y_test, categories.shape[1]
 
 
-def train(num_epochs = 20, num_batch_size = 128):
+def create_model(num_labels, num_rows, num_columns, num_channels):
+    model = Sequential()
+    model.add(Conv2D(filters=16, kernel_size=2, input_shape=(num_rows, num_columns, num_channels), activation='relu'))
+    model.add(MaxPooling2D(pool_size=2))
+    model.add(Dropout(0.2))
+
+    model.add(Conv2D(filters=32, kernel_size=2, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2))
+    model.add(Dropout(0.2))
+
+    model.add(Conv2D(filters=64, kernel_size=2, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2))
+    model.add(Dropout(0.2))
+
+    model.add(Conv2D(filters=128, kernel_size=2, activation='relu'))
+    model.add(MaxPooling2D(pool_size=2))
+    model.add(Dropout(0.2))
+    model.add(GlobalAveragePooling2D())
+
+    model.add(Dense(num_labels, activation='softmax'))
+    return model
+
+
+def train():
     """
         Function to train
         :param  num_epochs: number times that the learning algorithm will work
@@ -44,16 +70,16 @@ def train(num_epochs = 20, num_batch_size = 128):
     """
     config = get_merged_values()
 
-    num_rows = 10
-    num_columns = 4
+    num_rows = 40
+    num_columns = 129
     num_channels = 1
 
-    x_train, x_test, y_train, y_test = prepare_data('src/data/AnimalSound.csv')
+    x_train, x_test, y_train, y_test, num_labels = prepare_data('src/data/AnimalSound.csv')
 
     x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
     x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
 
-    model = SoundAnimalDetector(dim_output=3, num_rows = num_rows, num_columns = num_columns, num_channels = num_channels)
+    model = create_model(num_labels, num_rows, num_columns, num_channels)
 
     model.compile(
         optimizer='adam',
