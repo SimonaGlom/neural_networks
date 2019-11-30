@@ -86,8 +86,11 @@ class Animal:
     def get_spectograms_count(self):
         return len(self.spectograms)
 
-    def get_spectograms(self):
-        return self.spectograms
+    def get_spectograms(self, max_spectograms=False):
+        if not max:
+            return self.spectograms
+
+        return self.spectograms[:max_spectograms]
 
     def get_name(self):
         return self.name
