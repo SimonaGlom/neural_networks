@@ -4,6 +4,7 @@ import src.models.preprocessor as preprocessor
 import logging
 import shutil
 import glob, os
+import csv
 
 
 class Dataset:
@@ -87,7 +88,7 @@ class Animal:
         return len(self.spectograms)
 
     def get_spectograms(self, max_spectograms=False):
-        if not max:
+        if not max_spectograms:
             return self.spectograms
 
         return self.spectograms[:max_spectograms]
@@ -170,4 +171,18 @@ if __name__ == '__main__':
     dataset = Dataset(dataset_path)
 
     animals = dataset.get_animals(min_samples=0, only_with_spieces_name=False)
-    print(len(animals))
+
+    writer = csv.writer(open("src/data/AnimalSound.csv", 'w'))
+
+    writer.writerow(["src", "sk_name", "latin_name", "class_name"])
+    with open('src/data/AnimalSound.csv', 'w', newline='') as file:
+        for animal in animals:
+            if animal.has_assigned_spieces():
+                spiece = animal.get_spieces()
+            else:
+                spiece = None
+
+            if animal.get_spectograms_count() > 1:
+                for spectogram in animal.get_spectograms():
+
+                    writer.writerow([spectogram.replace('.png', '.wav'), animal.get_name_sk(), animal.get_name(), spiece])
