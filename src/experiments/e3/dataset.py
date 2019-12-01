@@ -8,7 +8,7 @@ with open('src/data/AnimalSound.csv') as csv_file:
     writer = csv.writer(open(root_path + 'data/e.csv', 'w'))
 
     logging.info('Dataset loading ...')
-    line_count = 1
+    line_count = 0
     for row in csv_reader:
         line_count += 1
         class_name = row[3]

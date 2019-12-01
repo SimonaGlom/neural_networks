@@ -32,7 +32,7 @@ def prepare_data(path):
         for row in csv_reader:
             if row[0] != 'src':
                 line_count += 1
-                class_label = row[2]
+                class_label = row[3]
                 spectogram_path = row[0].replace('.wav', '.txt')
                 exists = os.path.exists(spectogram_path)
                 # save data
