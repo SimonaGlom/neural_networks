@@ -24,7 +24,7 @@ def prepare_data(path):
     """
 
     features = []
-    with open('data/e.csv') as csv_file:
+    with open(path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
 
         logging.info('Dataset loading ...')
