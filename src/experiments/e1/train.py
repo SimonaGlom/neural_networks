@@ -12,8 +12,8 @@ from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dro
 import csv
 
 # Update for every experiment
-from src.experiments.e1.preprocessor import mfcc_spectogram
-from src.experiments.e1.config import get_merged_values
+from preprocessor import mfcc_spectogram
+from config import get_merged_values
 root_path = 'src/experiments/e1/'
 
 def prepare_data(path):
