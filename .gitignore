@@ -6,3 +6,4 @@ data/
 !data/.initial
 notebooks/.ipynb_checkpoints
 dataset_parser/__pycache__/
+logs/
