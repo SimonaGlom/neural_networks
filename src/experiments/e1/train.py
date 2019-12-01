@@ -24,8 +24,6 @@ def prepare_data(path):
     features = []
     metadata = pd.read_csv(path)
 
-    logging.info("Loading dataset")
-
     for index, row in metadata.iterrows():
         class_label = row["class_name"]
 
@@ -106,7 +104,7 @@ def train():
               epochs=config['num_epochs'],
               validation_data=(x_test, y_test),
               callbacks=[keras.callbacks.TensorBoard(
-                  log_dir=os.path.join('src/experiments/e1/logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
+                  log_dir=os.path.join('logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                   histogram_freq=1,
                   profile_batch=0
               ),
@@ -140,7 +138,6 @@ def learning_rate(num_epoch):
         learning_rate = 0.02
     if num_epoch > 15:
         learning_rate = 0.005
-
     return learning_rate
 
 
