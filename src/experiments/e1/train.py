@@ -25,6 +25,7 @@ def prepare_data(path):
     features = []
     metadata = pd.read_csv(path)
 
+    logging.info('Dataset loading ...')
     for index, row in metadata.iterrows():
         class_label = row["class_name"]
 
