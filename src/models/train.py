@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import datetime
-from config import get_merged_values
+from src.experiments.e1.config import get_merged_values
 import logging
 from preprocessor import mfcc_spectogram
 from tensorflow.keras.models import Sequential
