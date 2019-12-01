@@ -25,17 +25,17 @@ class Dataset:
 
         for key_spieces in self.raw_dataset:
             raw_animal = self.raw_dataset[key_spieces]
-            spectograms = []
+            records = []
 
             if self.record_path_key in self.raw_dataset[key_spieces]:
                 for record in self.raw_dataset[key_spieces][self.record_path_key]:
                     record_path = self.raw_dataset[key_spieces][self.record_path_key][record].decode("utf-8")
                     record = Record(record_path, key_spieces)
-                    spectograms += record.get_spectograms()
+                    records += record.get_parts()
 
-            animal = Animal(key_spieces, raw_animal['name'], raw_animal['spieces'], spectograms)
+            animal = Animal(key_spieces, raw_animal['name'], raw_animal['spieces'], records)
 
-            if animal.get_spectograms_count() > min_samples and (not only_with_spieces_name or animal.has_assigned_spieces()):
+            if animal.get_records_count() > min_samples and (not only_with_spieces_name or animal.has_assigned_spieces()):
                 animals.append(animal)
 
         return animals
@@ -73,8 +73,8 @@ class Dataset:
 
                     record.split_parts(record_folder)
 
-                if not record.get_spectograms() or delete:
-                    record.create_spectograms()
+                #if not record.get_spectograms() or delete:
+                #    record.create_spectograms()
 
 
 class Animal:
@@ -84,10 +84,10 @@ class Animal:
         self.spieces_name = spieces_name
         self.spectograms = spectograms
 
-    def get_spectograms_count(self):
+    def get_records_count(self):
         return len(self.spectograms)
 
-    def get_spectograms(self, max_spectograms=False):
+    def get_records(self, max_spectograms=False):
         if not max_spectograms:
             return self.spectograms
 
@@ -169,6 +169,7 @@ if __name__ == '__main__':
 
     dataset_path = 'dataset_parser/dataset_info.save'
     dataset = Dataset(dataset_path)
+    dataset.split_records(True)
 
     animals = dataset.get_animals(min_samples=0, only_with_spieces_name=False)
 
@@ -182,7 +183,6 @@ if __name__ == '__main__':
             else:
                 spiece = None
 
-            if animal.get_spectograms_count() > 1:
-                for spectogram in animal.get_spectograms():
-
-                    writer.writerow([spectogram.replace('.png', '.wav'), animal.get_name_sk(), animal.get_name(), spiece])
+            if animal.get_records_count() > 1:
+                for record in animal.get_records():
+                    writer.writerow([record, animal.get_name_sk(), animal.get_name(), spiece])
