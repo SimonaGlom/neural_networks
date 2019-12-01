@@ -11,7 +11,8 @@ from config import get_merged_values
 import logging
 from preprocessor import mfcc_spectogram
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Conv2D, MaxPooling2D,Dropout, GlobalAveragePooling2D
+from keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
+
 
 def prepare_data(path):
     """
@@ -29,11 +30,11 @@ def prepare_data(path):
         features.append([data, class_label])
 
     featuresdf = pd.DataFrame(features, columns=['feature', 'class_label'])
-    mfccs = numpy.array(featuresdf.feature.tolist()) # creating mfcc spectogram
+    mfccs = numpy.array(featuresdf.feature.tolist())  # creating mfcc spectogram
     category = numpy.array(featuresdf.class_label.tolist())
     label_encoder = LabelEncoder()
     categories = to_categorical(label_encoder.fit_transform(category))
-    x_train, x_test, y_train, y_test = train_test_split(mfccs, categories, test_size = 0.2)
+    x_train, x_test, y_train, y_test = train_test_split(mfccs, categories, test_size=0.2)
 
     return x_train, x_test, y_train, y_test, categories.shape[1]
 
@@ -96,10 +97,11 @@ def train():
                   log_dir=os.path.join('logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                   histogram_freq=1,
                   profile_batch=0
-              )],
+              )
+              ],
               verbose=config['verbose'])
 
-    model.save('/models/', save_format='tf')
+    model.save(f'models/model-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}.h5')
     model.predict(x_test)
 
 
