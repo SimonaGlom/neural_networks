@@ -34,7 +34,7 @@ class Dataset:
                     records += record.get_parts()
 
             animal = Animal(key_spieces, raw_animal['name'], raw_animal['spieces'], records)
-
+            print(animal.get_records_count())
             if animal.get_records_count() > min_samples and (not only_with_spieces_name or animal.has_assigned_spieces()):
                 animals.append(animal)
 
@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
     dataset_path = 'dataset_parser/dataset_info.save'
     dataset = Dataset(dataset_path)
-    dataset.split_records(True)
+    #dataset.split_records(False)
 
     for i in range(1, 100):
         animals = dataset.get_animals(min_samples=10*i, only_with_spieces_name=False)

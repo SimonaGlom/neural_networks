@@ -9,6 +9,7 @@ import tensorflow.keras as keras
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
+import csv
 
 # Update for every experiment
 from src.experiments.e1.preprocessor import mfcc_spectogram
@@ -27,7 +28,7 @@ def prepare_data(path):
 
     logging.info('Dataset loading ...')
     for index, row in metadata.iterrows():
-        class_label = row["class_name"]
+        class_label = row["latin_name"]
 
         spectogram_path = row["src"].replace('.wav', '.txt')
         exists = os.path.exists(spectogram_path)
@@ -87,46 +88,53 @@ def train():
     num_columns = 129
     num_channels = 1
 
-    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path+'data/experiment3.csv')
+    writer = csv.writer(open("src/experiments/e1/result.csv", 'w'))
+    writer.writerow(["file", "min_samples", "result"])
 
-    x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
-    x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
+    i = 1
+    for csv_file in os.listdir(root_path+'data'):
+        x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path+'data/'+csv_file)
+        x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
+        x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
 
-    model = create_model(num_labels, num_rows, num_columns, num_channels)
+        model = create_model(num_labels, num_rows, num_columns, num_channels)
 
-    model.compile(
-        optimizer='adam',
-        loss='categorical_crossentropy',
-        metrics=['accuracy']
-    )
+        model.compile(
+            optimizer='adam',
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
 
-    model.fit(x_train,
-              y_train,
-              batch_size=config['batch_size'],
-              epochs=config['num_epochs'],
-              validation_data=(x_test, y_test),
-              callbacks=[keras.callbacks.TensorBoard(
-                  log_dir=os.path.join(root_path+'logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
-                  histogram_freq=1,
-                  profile_batch=0
-              ),
-                  keras.callbacks.EarlyStopping(monitor='loss', patience=8),
-                  keras.callbacks.LearningRateScheduler(learning_rate)
-              ],
-              verbose=config['verbose'])
+        model.fit(x_train,
+                  y_train,
+                  batch_size=config['batch_size'],
+                  epochs=config['num_epochs'],
+                  validation_data=(x_test, y_test),
+                  callbacks=[keras.callbacks.TensorBoard(
+                      log_dir=os.path.join(root_path+'logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
+                      histogram_freq=1,
+                      profile_batch=0
+                  ),
+                      keras.callbacks.EarlyStopping(monitor='loss', patience=8),
+                      keras.callbacks.LearningRateScheduler(learning_rate)
+                  ],
+                  verbose=config['verbose'])
 
-    print('Model is evaluating...')
-    result = model.evaluate(x_train, y_train, verbose=1)
-    print('Result of evaluation is: ', result)
+        print('Model is evaluating...')
+        result = model.evaluate(x_train, y_train, verbose=0)
+        writer.writerow([csv_file, str(i*10), result])
+        print('Result of evaluation is: ', result)
 
-    print('Model is saving...')
-    date = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    model.save(f'{root_path}models/model-{date}.h5')
-    print('Model was saved: models/model-', date, '.h5')
+        print('Model is saving...')
+        date = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        model.save(f'{root_path}models/model-{date}.h5')
+        print('Model was saved: models/model-', date, '.h5')
 
-    print('Model is predicting ...')
-    predicted_values = model.predict(x_test)
-    print('Result of predict is: ', predicted_values)
+        print('Model is predicting ...')
+        predicted_values = model.predict(x_test)
+        print('Result of predict is: ', predicted_values)
+
+        i += 1
 
 
 def learning_rate(num_epoch):
