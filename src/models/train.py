@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy
 import tensorflow.keras as keras
-from model import SoundAnimalDetector
+from src.experiments.e1.model import SoundAnimalDetector
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
@@ -12,7 +12,6 @@ import logging
 from preprocessor import mfcc_spectogram
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
-import tensorflow as tf
 
 def prepare_data(path):
     """
