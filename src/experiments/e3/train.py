@@ -9,9 +9,9 @@ import tensorflow.keras as keras
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
+import csv
 
 # Update for every experiment
-from dataset import Dataset
 from src.experiments.e3.preprocessor import mfcc_spectogram
 from src.experiments.e3.config import get_merged_values
 root_path = 'src/experiments/e3/'
@@ -24,28 +24,29 @@ def prepare_data(path):
     """
 
     features = []
-    metadata = pd.read_csv(path)
+    with open('data/e.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
 
-    logging.info('Dataset loading ...')
-    for index, row in metadata.iterrows():
-        class_label = row["class_name"]
+        logging.info('Dataset loading ...')
+        line_count = 1
 
-        if(class_label):
-            print(class_label)
-        else:
-            print('inelse', class_label)
+        for row in csv_reader:
+            print(row)
 
-        spectogram_path = row["src"].replace('.wav', '.txt')
-        exists = os.path.exists(spectogram_path)
+            line_count += 1
+            class_label = row[2]
+            spectogram_path = row[0].replace('.wav', '.txt')
+            exists = os.path.exists(spectogram_path)
 
-        # save data
-        if exists:
-            data = numpy.loadtxt(spectogram_path)
-        else:
-            data = mfcc_spectogram(str(row["src"]))
-            numpy.savetxt(spectogram_path, data)
+            # save data
+            if exists:
+                data = numpy.loadtxt(spectogram_path)
+            else:
+                data = mfcc_spectogram(str(row[0]))
+                numpy.savetxt(spectogram_path, data)
 
-        features.append([data, class_label])
+            features.append([data, class_label])
+
 
     featuresdf = pd.DataFrame(features, columns=['feature', 'class_label'])
     mfccs = numpy.array(featuresdf.feature.tolist())  # creating mfcc spectogram
@@ -94,7 +95,7 @@ def train():
     num_columns = 129
     num_channels = 1
 
-    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path+'data/e.csv')
+    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path + 'data/e.csv')
 
     x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
     x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
@@ -151,19 +152,18 @@ def learning_rate(num_epoch):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    with open('src/data/AnimalSound.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
 
-    dataset_path = 'dataset_parser/dataset_info.save'
-    dataset = Dataset(dataset_path)
-    dataset.split_records(True)
-    animals = dataset.get_animals(min_samples=0, only_with_spieces_name=True)
+        writer = csv.writer(open(root_path + 'data/e.csv', 'w'))
 
-    writer = csv.writer(open(root_path, 'w'))
+        logging.info('Dataset loading ...')
+        line_count = 1
+        for row in csv_reader:
+            line_count += 1
+            class_name = row[3]
+            if class_name is not '':
+                with open(root_path + 'data/e.csv', 'w', newline='') as file:
+                    writer.writerow([row[0], row[1], class_name])
 
-    writer.writerow(["src", "sk_name", "latin_name", "class_name"])
-    with open(root_path, 'w', newline='') as file:
-        for animal in animals:
-            if animal.has_assigned_spieces():
-                if animal.get_records_count() > 1:
-                    for record in animal.get_records():
-                        writer.writerow([record, animal.get_name_sk(), animal.get_name(), animal.get_spieces()])
+        train()
