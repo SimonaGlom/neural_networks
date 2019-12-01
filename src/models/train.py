@@ -97,7 +97,8 @@ def train():
                   log_dir=os.path.join('logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                   histogram_freq=1,
                   profile_batch=0
-              )
+              ),
+                  keras.callbacks.EarlyStopping(monitor='val_loss', patience=4)
               ],
               verbose=config['verbose'])
 
