@@ -17,6 +17,8 @@ def parse_argument():
                         help="Usage constant of batch size")
     parser.add_argument("-lr", "--learning-rate", dest="learning_rate",
                         help="Usage constant of learning rate")
+    parser.add_argument("-dlr", "--dynamic-learning-rate", dest="dynamic_learning_rate",
+                        help="Usage constant of dynamic learning rate")
     parser.add_argument("-e", "--epochs", dest="num_epochs",
                         help="Usage of number of epochs")
     parser.add_argument("-v", "--verbose", dest="verbose",

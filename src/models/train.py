@@ -98,7 +98,8 @@ def train():
                   histogram_freq=1,
                   profile_batch=0
               ),
-                  keras.callbacks.EarlyStopping(monitor='loss', patience=8)
+                  keras.callbacks.EarlyStopping(monitor='loss', patience=8),
+                  keras.callbacks.LearningRateScheduler(learning_rate)
               ],
               verbose=config['verbose'])
 
@@ -109,11 +110,26 @@ def train():
     print('Model is saving...')
     date = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     model.save(f'models/model-{date}.h5')
-    print('Model was saved: models/model-',date,'.h5')
+    print('Model was saved: models/model-', date, '.h5')
 
     print('Model is predicting ...')
     predicted_values = model.predict(x_test)
     print('Result of predict is: ', predicted_values)
+
+
+def learning_rate(num_epoch):
+    config = get_merged_values()
+
+    if config['dynamic_learning_rate'] is False:
+        return config['learning_rate']
+
+    num_epoch= config['num_epochs']
+    if num_epoch > 5:
+        learning_rate = 0.02
+    if num_epoch > 15:
+        learning_rate = 0.005
+    return learning_rate
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
