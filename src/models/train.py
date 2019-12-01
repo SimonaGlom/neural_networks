@@ -98,19 +98,22 @@ def train():
                   histogram_freq=1,
                   profile_batch=0
               ),
-                  keras.callbacks.EarlyStopping(monitor='val_loss', patience=4)
+                  keras.callbacks.EarlyStopping(monitor='loss', patience=8)
               ],
               verbose=config['verbose'])
 
     print('Model is evaluating...')
-    result = model.evaulate(x_train, y_train, verbose=1)
+    result = model.evaluate(x_train, y_train, verbose=1)
     print('Result of evaluation is: ', result)
 
     print('Model is saving...')
-    model.save(f'models/model-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}.h5')
-    print('Model was saved')
-    model.predict(x_test)
+    date = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    model.save(f'models/model-{date}.h5')
+    print('Model was saved: models/model-',date,'.h5')
 
+    print('Model is predicting ...')
+    predicted_values = model.predict(x_test)
+    print('Result of predict is: ', predicted_values)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
