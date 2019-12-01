@@ -9,6 +9,7 @@ import tensorflow.keras as keras
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
+import csv
 
 # Update for every experiment
 from src.experiments.e3.preprocessor import mfcc_spectogram
