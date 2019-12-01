@@ -4,14 +4,15 @@ import numpy
 import tensorflow.keras as keras
 from model import SoundAnimalDetector
 from sklearn.preprocessing import LabelEncoder
-from keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import datetime
 from config import get_merged_values
 import logging
 from preprocessor import mfcc_spectogram
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Conv2D, MaxPooling2D,Dropout, GlobalAveragePooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
+import tensorflow as tf
 
 def prepare_data(path):
     """
@@ -25,15 +26,25 @@ def prepare_data(path):
 
     for index, row in metadata.iterrows():
         class_label = row["class_name"]
-        data = mfcc_spectogram(str(row["src"]))
+
+        spectogram_path = row["src"].replace('.wav', '.txt')
+        exists = os.path.exists(spectogram_path)
+
+        # save data
+        if exists:
+            data = numpy.loadtxt(spectogram_path)
+        else:
+            data = mfcc_spectogram(str(row["src"]))
+            numpy.savetxt(spectogram_path, data)
+
         features.append([data, class_label])
 
     featuresdf = pd.DataFrame(features, columns=['feature', 'class_label'])
-    mfccs = numpy.array(featuresdf.feature.tolist()) # creating mfcc spectogram
+    mfccs = numpy.array(featuresdf.feature.tolist())  # creating mfcc spectogram
     category = numpy.array(featuresdf.class_label.tolist())
     label_encoder = LabelEncoder()
     categories = to_categorical(label_encoder.fit_transform(category))
-    x_train, x_test, y_train, y_test = train_test_split(mfccs, categories, test_size = 0.2)
+    x_train, x_test, y_train, y_test = train_test_split(mfccs, categories, test_size=0.2)
 
     return x_train, x_test, y_train, y_test, categories.shape[1]
 
@@ -96,14 +107,46 @@ def train():
                   log_dir=os.path.join('logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                   histogram_freq=1,
                   profile_batch=0
-              )],
+              ),
+                  keras.callbacks.EarlyStopping(monitor='loss', patience=8),
+                  keras.callbacks.LearningRateScheduler(learning_rate)
+              ],
               verbose=config['verbose'])
 
-    model.save('/models/', save_format='tf')
-    model.predict(x_test)
+    print('Model is evaluating...')
+    result = model.evaluate(x_train, y_train, verbose=1)
+    print('Result of evaluation is: ', result)
+
+    print('Model is saving...')
+    date = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    model.save(f'models/model-{date}.h5')
+    print('Model was saved: models/model-', date, '.h5')
+
+    print('Model is predicting ...')
+    predicted_values = model.predict(x_test)
+    print('Result of predict is: ', predicted_values)
+
+
+def learning_rate(num_epoch):
+    config = get_merged_values()
+
+    if config['dynamic_learning_rate'] is False:
+        return config['learning_rate']
+
+    num_epoch = config['num_epochs']
+
+    if num_epoch > 5:
+        learning_rate = 0.02
+    if num_epoch > 15:
+        learning_rate = 0.005
+
+    return learning_rate
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-
+#    tf.test.is_gpu_available(
+#        cuda_only=False,
+#        min_cuda_compute_capability=None
+#    )
     train()

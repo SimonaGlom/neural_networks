@@ -1,6 +1,6 @@
 import tensorflow.keras as keras
-from keras.models import Sequential
-from keras.layers import Dense, MaxPooling2D, Dropout, Conv2D, GlobalAveragePooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, MaxPooling2D, Dropout, Conv2D, GlobalAveragePooling2D
 
 class SoundAnimalDetector(keras.Model):
     def __init__(self, dim_output, num_rows, num_columns, num_channels):
