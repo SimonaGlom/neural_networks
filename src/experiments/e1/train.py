@@ -1,18 +1,19 @@
 import os
 import pandas as pd
 import numpy
-import tensorflow.keras as keras
-from model import SoundAnimalDetector
-from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.utils import to_categorical
-from sklearn.model_selection import train_test_split
 import datetime
-from config import get_merged_values
 import logging
-from preprocessor import mfcc_spectogram
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+import tensorflow.keras as keras
+from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
-import tensorflow as tf
+
+# Update for every experiment
+from src.experiments.e1.preprocessor import mfcc_spectogram
+from src.experiments.e1.config import get_merged_values
+root_path = 'src/experiments/e1/'
 
 def prepare_data(path):
     """
@@ -85,7 +86,7 @@ def train():
     num_columns = 129
     num_channels = 1
 
-    x_train, x_test, y_train, y_test, num_labels = prepare_data('src/data/AnimalSound.csv')
+    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path+'data/e.csv')
 
     x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
     x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
@@ -104,7 +105,7 @@ def train():
               epochs=config['num_epochs'],
               validation_data=(x_test, y_test),
               callbacks=[keras.callbacks.TensorBoard(
-                  log_dir=os.path.join('logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
+                  log_dir=os.path.join(root_path+'logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                   histogram_freq=1,
                   profile_batch=0
               ),
@@ -119,7 +120,7 @@ def train():
 
     print('Model is saving...')
     date = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    model.save(f'models/model-{date}.h5')
+    model.save(f'{root_path}models/model-{date}.h5')
     print('Model was saved: models/model-', date, '.h5')
 
     print('Model is predicting ...')

@@ -2,12 +2,12 @@ import os
 import pandas as pd
 import numpy
 import tensorflow.keras as keras
-from src.experiments.e1.model import SoundAnimalDetector
+from model import SoundAnimalDetector
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import datetime
-from src.experiments.e1.config import get_merged_values
+from config import get_merged_values
 import logging
 from preprocessor import mfcc_spectogram
 from tensorflow.keras.models import Sequential
@@ -105,7 +105,7 @@ def train():
               epochs=config['num_epochs'],
               validation_data=(x_test, y_test),
               callbacks=[keras.callbacks.TensorBoard(
-                  log_dir=os.path.join('src/experiments/e1/logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
+                  log_dir=os.path.join('./logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                   histogram_freq=1,
                   profile_batch=0
               ),
