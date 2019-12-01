@@ -102,7 +102,13 @@ def train():
               ],
               verbose=config['verbose'])
 
+    print('Model is evaluating...')
+    result = model.evaulate(x_train, y_train, verbose=1)
+    print('Result of evaluation is: ', result)
+
+    print('Model is saving...')
     model.save(f'models/model-{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}.h5')
+    print('Model was saved')
     model.predict(x_test)
 
 
