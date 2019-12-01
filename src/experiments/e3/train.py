@@ -12,8 +12,8 @@ from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dro
 import csv
 
 # Update for every experiment
-from src.experiments.e3.preprocessor import mfcc_spectogram
-from src.experiments.e3.config import get_merged_values
+from preprocessor import mfcc_spectogram
+from config import get_merged_values
 root_path = 'src/experiments/e3/'
 
 def prepare_data(path):
@@ -26,26 +26,23 @@ def prepare_data(path):
     features = []
     with open(path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
-
         logging.info('Dataset loading ...')
-        line_count = 1
 
+        line_count = 0
         for row in csv_reader:
+            if row[0] != 'src':
+                line_count += 1
+                class_label = row[2]
+                spectogram_path = row[0].replace('.wav', '.txt')
+                exists = os.path.exists(spectogram_path)
+                # save data
+                if exists:
+                    data = numpy.loadtxt(spectogram_path)
+                else:
+                    data = mfcc_spectogram(str(row[0]))
+                    numpy.savetxt(spectogram_path, data)
 
-            line_count += 1
-            class_label = row[2]
-            spectogram_path = row[0].replace('.wav', '.txt')
-            exists = os.path.exists(spectogram_path)
-
-            # save data
-            if exists:
-                data = numpy.loadtxt(spectogram_path)
-            else:
-                data = mfcc_spectogram(str(row[0]))
-                numpy.savetxt(spectogram_path, data)
-
-            features.append([data, class_label])
-
+                features.append([data, class_label])
 
     featuresdf = pd.DataFrame(features, columns=['feature', 'class_label'])
     mfccs = numpy.array(featuresdf.feature.tolist())  # creating mfcc spectogram
@@ -94,7 +91,10 @@ def train():
     num_columns = 129
     num_channels = 1
 
+    print(prepare_data(root_path + 'data/e.csv'))
     x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path + 'data/e.csv')
+
+    print(x_train)
 
     x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
     x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
@@ -151,18 +151,4 @@ def learning_rate(num_epoch):
 
 
 if __name__ == '__main__':
-    with open('src/data/AnimalSound.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-
-        writer = csv.writer(open(root_path + 'data/e.csv', 'w'))
-
-        logging.info('Dataset loading ...')
-        line_count = 1
-        for row in csv_reader:
-            line_count += 1
-            class_name = row[3]
-            if class_name is not '':
-                with open(root_path + 'data/e.csv', 'w', newline='') as file:
-                    writer.writerow([row[0], row[1], class_name])
-
         train()
