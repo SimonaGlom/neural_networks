@@ -91,8 +91,8 @@ def train():
     num_columns = 129
     num_channels = 1
 
-    print(prepare_data(root_path + 'data/e.csv'))
-    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path + 'data/e.csv')
+    print(prepare_data(root_path + 'data/experiment3.csv'))
+    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path + 'data/experiment3.csv')
 
     print(x_train)
 
@@ -117,7 +117,7 @@ def train():
                   histogram_freq=1,
                   profile_batch=0
               ),
-                  keras.callbacks.EarlyStopping(monitor='loss', patience=8),
+                  keras.callbacks.EarlyStopping(monitor='loss', patience=20),
                   keras.callbacks.LearningRateScheduler(learning_rate)
               ],
               verbose=config['verbose'])

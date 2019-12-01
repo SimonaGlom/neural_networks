@@ -87,7 +87,7 @@ def train():
     num_columns = 129
     num_channels = 1
 
-    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path+'data/e.csv')
+    x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path+'data/experiment3.csv')
 
     x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
     x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
