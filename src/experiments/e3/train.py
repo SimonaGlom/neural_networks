@@ -11,9 +11,10 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Dropout, GlobalAveragePooling2D
 
 # Update for every experiment
-from src.experiments.e2.preprocessor import mfcc_spectogram
-from src.experiments.e2.config import get_merged_values
-root_path = 'src/experiments/e2/'
+from dataset import Dataset
+from src.experiments.e3.preprocessor import mfcc_spectogram
+from src.experiments.e3.config import get_merged_values
+root_path = 'src/experiments/e3/'
 
 def prepare_data(path):
     """
@@ -28,6 +29,11 @@ def prepare_data(path):
     logging.info('Dataset loading ...')
     for index, row in metadata.iterrows():
         class_label = row["class_name"]
+
+        if(class_label):
+            print(class_label)
+        else:
+            print('inelse', class_label)
 
         spectogram_path = row["src"].replace('.wav', '.txt')
         exists = os.path.exists(spectogram_path)
@@ -46,6 +52,7 @@ def prepare_data(path):
     category = numpy.array(featuresdf.class_label.tolist())
     label_encoder = LabelEncoder()
     categories = to_categorical(label_encoder.fit_transform(category))
+
     x_train, x_test, y_train, y_test = train_test_split(mfccs, categories, test_size=0.2)
 
     return x_train, x_test, y_train, y_test, categories.shape[1]
@@ -146,4 +153,17 @@ def learning_rate(num_epoch):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 
-    train()
+    dataset_path = 'dataset_parser/dataset_info.save'
+    dataset = Dataset(dataset_path)
+    dataset.split_records(True)
+    animals = dataset.get_animals(min_samples=0, only_with_spieces_name=True)
+
+    writer = csv.writer(open(root_path, 'w'))
+
+    writer.writerow(["src", "sk_name", "latin_name", "class_name"])
+    with open(root_path, 'w', newline='') as file:
+        for animal in animals:
+            if animal.has_assigned_spieces():
+                if animal.get_records_count() > 1:
+                    for record in animal.get_records():
+                        writer.writerow([record, animal.get_name_sk(), animal.get_name(), animal.get_spieces()])
