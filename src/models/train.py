@@ -133,20 +133,15 @@ def learning_rate(num_epoch):
     if config['dynamic_learning_rate'] is False:
         return config['learning_rate']
 
-    num_epoch = config['num_epochs']
-
+    num_epoch= config['num_epochs']
     if num_epoch > 5:
         learning_rate = 0.02
     if num_epoch > 15:
         learning_rate = 0.005
-
     return learning_rate
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-#    tf.test.is_gpu_available(
-#        cuda_only=False,
-#        min_cuda_compute_capability=None
-#    )
+
     train()
