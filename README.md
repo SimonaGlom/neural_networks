@@ -54,6 +54,79 @@ Tabuľka zobrazujúca výstup na obrázku znázorňuje s akou pravdepodobnosťou
 
 ![Algoritmus navrhu riesenia projektu](./images/algo.png)
 
+## Opis modelu
+
+Finálny model na klasifikáciu zvukov zvierat vidíme na obrázku. Model prešiel iteráciami na základe podobných prác bol navrhnutý ako jednoduchý prototyp, ktorý sme vylepšili na finálny model.
+
+![MOdel_finálnej_neurónovej_siete](./images/final-model.png)
+
+
+## Proces trénovania
+
+1. Vytvorenie dataset, zahŕňa proces konvertovania mp3 na wav, rozdelenia na 3 sekudové úseky a zmeny na MFCCS spektogram. Výstupom procesu vytvorenia
+datasetu je .csv súbor s cestou k zvukovej zložke zvieraťa a ďalšie pridané parametre podľa  potreby experimentov.
+2. Ako vstup do neurónovej siete je potrebné dať maticu v správnom tvare. Predspracovanie z každej položky z vytvoreného datasetu na matice o veľkosti 4 x 10 nám vytváralo vyššiu časovú zložitosť ako samotné trénovanie. Na vyriešenie problému sme zvloli prístup serializácie matíc, ktoré už boli predpočítané. V prvom behu sa teda matice serializovali a v ďalších iteráciach experimentu boli použité už predpočítané matice.
+3. Rozdelenie datasetu na trénovací a testovací
+4. Proces trénovania, evaluácia a predikcia 
+5. Zlepšovanie výsledkov sme vykonávali pomocou konfigurácie parametrov priamo z konzoly alebo zapísaním do konfiguračného súbora
+
+Na celý proces sme využili Google Cloud Transform, ktorý nám urýlchlil trénovania na svojích GPU.
+
+Po poznaní neurónovej siete sme zaviedli aj Early Stopping pre šetrenie času.
+`EarlyStopping(monitor='loss', patience=8)`
+
+## Vykonané experimenty
+
+__1. Experiment 1__
+__2. Experiment 2 - Klasifikácia názvu vtákov__
+ 
+Vstup do neurónovej siete sú vzorky zvierat iba druhu vtákov, týmto experimentom sme chceli zistiť ako naša neurónová sieť dokáže rozoznať vtáčie názvy.
+Klasifikovanli sme tieto názvy vtákov: Drozd plavý, Kukučka obyčajná, Strnádka žltá, Strnádka záhradná, Trsteniarik spevavý, Chrapkáč poľný
+Počet samplov 6973.
+
+V prvých fázach sme trénovali s hodnotami:
+
+`{
+  "batch_size": 128,
+  "learning_rate": 0.5,
+  "dynamic_learning_rate": false,
+  "num_epochs": 20,
+  "verbose": 1
+}`
+
+Pri takýchto parametroch daný experiment dosahoval úspešnosť 85%. Úspešnosť sme skúšali zvýšiť pomocou ladenia parametrov, 
+inkrementácia epoch nám presnosť nezmenila, preto sme sa zamerali na learning_rate. V poslednom trénovaní sme dosiahli 92% 
+úspešnosť pomocou týchto parametrov.
+
+`{
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "dynamic_learning_rate": false,
+  "num_epochs": 20,
+  "verbose": 1
+}`
+
+__3. Experiment 3 - Klasifikácia druhu zvieraťa__
+
+Po experimente číslo 2 nebola očakávaná taká vysoká presnosť, preto sme sa rozhodli skúsiť experiment na zvieratách rozličného druhu a tým porovnať koleráciu podobných a rozdielnych zvukových stôp.
+Pri poČiatoňom trénovaní sme trénovali na všetkých dátach, ktoré mali určený druh. Avšak museli sme tento prístup minimalizovať, preto sme si vybrali klasifikáciu iba dvoch rôznych druhov vtákov a cicavcov. Kvôli nedostatku cicavcov v datasete sme experiment ešte uprvili na dve zvieratá. 
+Zároveň tento experiment prebiehal s parametrami, ktoré nám dosahovali vysokú úroveň v experimente číslo 2. 
+Vybrali sme iba dve zvieratá na klasifikáciu: leva a drozda.  
+
+Mffc spektogram leva
+![Spektogram leva](./images/lev.png)
+
+Mffc spektogram drozda
+![Spektogram drozda](./images/drozd.png)
+
+
+Výsledok evaluácie modelu: 
+`[0.03709476282511984, 0.988794]`
+Experiment ukázal, že rozlišovanie dvoch druhov má vyššiu úspešnosť 98% ako rozlišovanie podobných zvukových stôp. Prvá epocha mala úspešnosť 68%.
+
+Vylepšenie tohto experimentu by sa dalo dosiahnuť pomocou pridaní, reps. využíti techniky šumu na zvukové stopy, čím by sme dosiahli viac vzoriek.
+ 
+
 ## Citácie
 
 [1] J. Salamon and J. P. Bello, "Deep Convolutional Neural Networks and Data Augmentation for Environmental Sound Classification," in IEEE Signal Processing Letters, vol. 24, no. 3, pp. 279-283, March 2017.
