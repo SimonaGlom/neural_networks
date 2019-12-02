@@ -38,7 +38,11 @@ def prepare_data(path):
             data = numpy.loadtxt(spectogram_path)
         else:
             data = mfcc_spectogram(str(row["src"]))
-            numpy.savetxt(spectogram_path, data)
+
+            try:
+                 numpy.savetxt(spectogram_path, data)
+            catch:
+                logging.info("error")
 
         features.append([data, class_label])
 
@@ -88,11 +92,8 @@ def train():
     num_columns = 129
     num_channels = 1
 
-    with open('names.csv', 'w') as csvfile:
-
-
     i = 1
-    with open("src/experiments/e1/result.csv", 'wb') as resultFile:
+    with open("src/experiments/e1/result.csv", 'w') as resultFile:
         writer = csv.writer(resultFile)
         writer.writerow(["file", "min_samples", "result"])
         resultFile.flush()
