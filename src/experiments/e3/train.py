@@ -14,7 +14,9 @@ import csv
 # Update for every experiment
 from preprocessor import mfcc_spectogram
 from config import get_merged_values
+
 root_path = 'src/experiments/e3/'
+
 
 def prepare_data(path):
     """
@@ -30,19 +32,18 @@ def prepare_data(path):
 
         line_count = 0
         for row in csv_reader:
-            if row[0] != 'src':
-                line_count += 1
-                class_label = row[3]
-                spectogram_path = row[0].replace('.wav', '.txt')
-                exists = os.path.exists(spectogram_path)
-                # save data
-                if exists:
-                    data = numpy.loadtxt(spectogram_path)
-                else:
-                    data = mfcc_spectogram(str(row[0]))
-                    numpy.savetxt(spectogram_path, data)
+            line_count += 1
+            class_label = row[3]
+            spectogram_path = row[0].replace('.wav', '.txt')
+            exists = os.path.exists(spectogram_path)
+            # save data
+            if exists:
+                data = numpy.loadtxt(spectogram_path)
+            else:
+                data = mfcc_spectogram(str(row[0]))
+                numpy.savetxt(spectogram_path, data)
 
-                features.append([data, class_label])
+            features.append([data, class_label])
 
     featuresdf = pd.DataFrame(features, columns=['feature', 'class_label'])
     mfccs = numpy.array(featuresdf.feature.tolist())  # creating mfcc spectogram
@@ -94,10 +95,11 @@ def train():
     print(prepare_data(root_path + 'data/experiment3.csv'))
     x_train, x_test, y_train, y_test, num_labels = prepare_data(root_path + 'data/experiment3.csv')
 
-    print(x_train)
-
     x_train = x_train.reshape(x_train.shape[0], num_rows, num_columns, num_channels)
     x_test = x_test.reshape(x_test.shape[0], num_rows, num_columns, num_channels)
+
+    writer = csv.writer(open("src/experiments/e3/result.csv", 'w'))
+    writer.writerow(["file", "result"])
 
     model = create_model(num_labels, num_rows, num_columns, num_channels)
 
@@ -113,7 +115,7 @@ def train():
               epochs=config['num_epochs'],
               validation_data=(x_test, y_test),
               callbacks=[keras.callbacks.TensorBoard(
-                  log_dir=os.path.join(root_path+'logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
+                  log_dir=os.path.join(root_path + 'logs', datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
                   histogram_freq=1,
                   profile_batch=0
               ),
@@ -124,6 +126,7 @@ def train():
 
     print('Model is evaluating...')
     result = model.evaluate(x_train, y_train, verbose=1)
+    writer.writerow(['experiment3.csv', result])
     print('Result of evaluation is: ', result)
 
     print('Model is saving...')
@@ -142,7 +145,7 @@ def learning_rate(num_epoch):
     if config['dynamic_learning_rate'] is False:
         return config['learning_rate']
 
-    num_epoch= config['num_epochs']
+    num_epoch = config['num_epochs']
     if num_epoch > 5:
         learning_rate = 0.02
     if num_epoch > 15:
@@ -151,4 +154,4 @@ def learning_rate(num_epoch):
 
 
 if __name__ == '__main__':
-        train()
+    train()
