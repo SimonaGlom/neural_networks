@@ -7,8 +7,6 @@ class SoundAnimalDetector(keras.Model):
         super(SoundAnimalDetector, self).__init__()
 
         self.model = Sequential()
-
-    def call(self, x,  dim_output, num_rows, num_columns, num_channels):
         self.model.add(
             Conv2D(filters=16, kernel_size=2, input_shape=(num_rows, num_columns, num_channels), activation='relu'))
         self.model.add(MaxPooling2D(pool_size=2))
@@ -28,4 +26,3 @@ class SoundAnimalDetector(keras.Model):
         self.model.add(GlobalAveragePooling2D())
 
         self.model.add(Dense(dim_output, activation='softmax'))
-        return self.model

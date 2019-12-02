@@ -128,7 +128,11 @@ def train():
     print('Result of predict is: ', predicted_values)
 
 
-def learning_rate(num_epoch):
+def learning_rate():
+    """
+    Set dynamic learning rate during traning process
+    :return: learning rate
+    """
     config = get_merged_values()
 
     if config['dynamic_learning_rate'] is False:
