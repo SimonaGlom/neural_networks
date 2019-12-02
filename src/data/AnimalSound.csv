@@ -1,5 +1,5 @@
 src,class_name
-data/raw/frog.wav,Frog
+dataset_parser/records/Crex_crex/crex_crex0/2.wav,Frog
 data/raw/vtak1.wav,Vtak
 data/raw/vtak2.wav,Vtak
 data/raw/vtak3.wav,Vtak
