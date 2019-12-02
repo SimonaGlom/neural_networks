@@ -157,16 +157,15 @@ __2. Experiment 2 - Klasifikácia názvu vtákov__
  
 Vstup do neurónovej siete sú vzorky zvierat iba druhu vtákov, týmto experimentom sme chceli zistiť ako naša neurónová sieť dokáže rozoznať vtáčie názvy.
 Klasifikovanli sme tieto názvy vtákov: Drozd plavý, Kukučka obyčajná, Strnádka žltá, Strnádka záhradná, Trsteniarik spevavý, Chrapkáč poľný
-Počet samplov 6973.
 
 V prvých fázach sme trénovali s hodnotami:
 
 `{
-  "batch_size": 128,
-  "learning_rate": 0.5,
-  "dynamic_learning_rate": false,
-  "num_epochs": 20,
-  "verbose": 1
+  "batch_size":             128,
+  "learning_rate":          0.5,
+  "dynamic_learning_rate":  false,
+  "num_epochs":             20,
+  "verbose":                1
 }`
 
 Pri takýchto parametroch daný experiment dosahoval úspešnosť 85%. Úspešnosť sme skúšali zvýšiť pomocou ladenia parametrov, 
@@ -174,11 +173,11 @@ inkrementácia epoch nám presnosť nezmenila, preto sme sa zamerali na learning
 úspešnosť pomocou týchto parametrov.
 
 `{
-  "batch_size": 128,
-  "learning_rate": 0.001,
-  "dynamic_learning_rate": false,
-  "num_epochs": 20,
-  "verbose": 1
+  "batch_size":             128,
+  "learning_rate":          0.001,
+  "dynamic_learning_rate":  false,
+  "num_epochs":             20,
+  "verbose":                1
 }`
 
 __3. Experiment 3 - Klasifikácia druhu zvieraťa__
@@ -201,7 +200,7 @@ Experiment ukázal, že rozlišovanie dvoch druhov má vyššiu úspešnosť 98%
 
 Vylepšenie tohto experimentu by sa dalo dosiahnuť pomocou pridaní, reps. využíti techniky šumu na zvukové stopy, čím by sme dosiahli viac vzoriek.
  
-
+ 
 ## Citácie
 
 [1] J. Salamon and J. P. Bello, "Deep Convolutional Neural Networks and Data Augmentation for Environmental Sound Classification," in IEEE Signal Processing Letters, vol. 24, no. 3, pp. 279-283, March 2017.
