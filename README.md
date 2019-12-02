@@ -97,14 +97,6 @@ MFCC sumarizuje vzorkovaciu frekvenciu pomocou veľkosti okna, a tak je možné 
 **Príklad MFCC spektogramu:**  
 ![MFCC spektogram](./images/mfcc.png)
 
-## Experimenty
-
-### Úvodný experiment
-#### Opis priebehu
-Týmto 
-
-#### Výsledky
-
 
 ## Návrh riešenia na vysokej úrovni
 
@@ -142,8 +134,25 @@ Po poznaní neurónovej siete sme zaviedli aj Early Stopping pre šetrenie času
 `EarlyStopping(monitor='loss', patience=8)`
 
 ## Vykonané experimenty
+__Úvodný experiment__  
+Pri úvodnom experimente sme chceli preskúmať schopnosť modelu rozpoznať konkrétne zvieratá, ak pri trénovaní modelu použijeme všetky dostupné vzorky, ktoré sa v datasete nachádzajú (1934 zvierat). Nefiltrovali ani nenormalizovali sme počet vzoriek pre jednotlivé zvieratá (pri niektorých zvieratách bolo dostupné väčšie množstvo vzoriek ako pri iných). Zaujímalo nás ako sa s týmito podmienkami vysporiada nami navrhnutý model neurónovej siete.
+ 
+Skúšali sme rôzne kombinácie parametrov avšak výsledná úspešnosť bola výsledná presnosť pod 1%. Tento experiment slúžil ako "odrazový mostík" pre zvyšné experimenty.
 
-__1. Experiment 1__
+__1. Experiment 1__  
+Využitím poznatkov z predchádzajúceho experimentu sme v tomto experimente chceli zistiť vplyv počtu testovaných zvierat na presnosť klasifikácie. Zvolili sme prístup trénovania a validácie experimentu v iteráciách.
+
+V každej iterácii sme zvyšovali minimálny počet vzoriek (každá iterácia -> minimum += 10), ktoré musí pre zviera existovať, aby bolo zapojené do trénovania/validácie. Týmto spôsobom sa postupne eliminovali zvieratá s menším počtom vzoriek.
+
+Pri trénovaní sme využívali tieto parametre:   
+`{ "batch_size": 128, "learning_rate": 0.005, "dynamic_learning_rate": false, "num_epochs": 20, "verbose": 1 }`
+
+Pri všetkých iteráciách sme použili konštantné parametre, aby sme vedeli výsledky porovnať.
+
+Pri prvej iterácii sme podľa vyššie uvedeného pravidla nastavili minimálny počet vzoriek na 100, čo splnilo 1051 zvierat. Pri prvej iterácii sme dosiahli presnosť klasifikácie 11,3%. Každou iteráciou sme toto minimum zvyšovali. Pri poslednej iterácii bol minimálny počet vzoriek stanovený na 1000. Túto podmienku spĺňalo už iba 9 zvierat, výsledna úspešnosť klasifikácie dosiahla 86,7%. Priebeh postupného rastu úspešnosti klasifikácie pri zvyšovaní podmienky na počet vzoriek/zviera môžeme vidieť na nasledujúcom grafe.  
+
+![Presnosť modelu](./images/iterations.png)
+
 __2. Experiment 2 - Klasifikácia názvu vtákov__
  
 Vstup do neurónovej siete sú vzorky zvierat iba druhu vtákov, týmto experimentom sme chceli zistiť ako naša neurónová sieť dokáže rozoznať vtáčie názvy.
@@ -179,10 +188,10 @@ Pri poČiatoňom trénovaní sme trénovali na všetkých dátach, ktoré mali u
 Zároveň tento experiment prebiehal s parametrami, ktoré nám dosahovali vysokú úroveň v experimente číslo 2. 
 Vybrali sme iba dve zvieratá na klasifikáciu: leva a drozda.  
 
-Mffc spektogram leva
+**Mffc spektogram leva**  
 ![Spektogram leva](./images/lev.png)
 
-Mffc spektogram drozda
+**Mffc spektogram drozda**  
 ![Spektogram drozda](./images/drozd.png)
 
 
