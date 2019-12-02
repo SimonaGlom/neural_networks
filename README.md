@@ -75,21 +75,35 @@ Najdlhšia zvuková stopa:                            88s
 ```
 ## Predspracovanie zvukových stôp
 1. **Stiahnutie zvukovej stopy**
-2. **Transformácia vzorkovacej frekvencie zvukovej stopy**  
+2. **Odstránenie miest s nízkou hlasitosťou("ticho") zo zvukovej stopy**
+3. **Transformácia vzorkovacej frekvencie zvukovej stopy**  
 Väčšina pôvodnych zvukových stôp má vzorkovaciu frekvenciu 44100 Hz, ale nájdu sa aj stopy s menšou frekvenciou. Preto je potrebné ju zjednotiť. Preto vzorkovaciu frekvenciu všetkých stôp konvertujeme na 22050 Hz (ktorá je vhodná pre budúce spracovanie našim modelom). 
 3. **Normalizovanie bitovej hĺbky**  
 Týmto procesom zabránime rôznym rozsahom bitovej hĺbky zvukových stôp. Výsledkom tohto kroku je transformovaná bitová hĺbka v rozsahu od -1.0 do 1.0.
 4. **Spojenie zvukových kanálov**  
 Spájame zvukové kanály stereo zvukových stôp. Výsledkom je zvuková stopa s mono kanálom. 
+5. **Rozloženie zvukovej stopy na menšie časti rovnakej dĺžky**
 
 #### Grafická reprezentácia transformácie zvukovej stopy do formy vhodnej na trénovanie 
 **Pred spracovaním:**  
-![Algoritmus navrhu riesenia projektu](./images/before_stereo.png)
+![Zvuková stopa pred spracovaním](./images/before_stereo.png)
 
 **Po spracovaní:**  
-![Algoritmus navrhu riesenia projektu](./images/after_mono.png)
+![Zvuková stopa po spracovaní](./images/after_mono.png)
 
 ## Reprezentácia zvukových stôp pomocou spektogramov
+MFCC sumarizuje vzorkovaciu frekvenciu pomocou veľkosti okna, a tak je možné analyzovať obidve frekvenčnú aj časovú charakteristiku zvukov. Pomocou tejto reprezentácie môžeme identifikovať vlastnosti potrebné pre klasifikáciu.
+
+**Príklad MFCC spektogramu:**  
+![MFCC spektogram](./images/mfcc.png)
+
+## Experimenty
+
+### Úvodný experiment
+#### Opis priebehu
+Týmto 
+
+#### Výsledky
 
 
 ## Návrh riešenia na vysokej úrovni
